@@ -56,7 +56,7 @@ for threads in ${THREAD_LIST}; do
   TORCH_COMPILE="${TORCH_COMPILE:-0}" \
   TORCH_COMPILE_MODE="${TORCH_COMPILE_MODE:-default}" \
   PROGRESS_EVERY=0 \
-  ./run_500m_fineweb_edu.sh --no-bnb)
+  ./scripts/training/run_500m_fineweb_edu.sh --no-bnb)
   if [[ -n "${CPUSET:-}" ]] && command -v taskset >/dev/null 2>&1; then
     taskset -c "${CPUSET}" "${CMD[@]}"
   else

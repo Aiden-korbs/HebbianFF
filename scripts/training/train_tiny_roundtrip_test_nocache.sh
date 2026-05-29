@@ -4,6 +4,7 @@ set -euo pipefail
 cd "$(dirname "$0")"
 
 export ROUNDTRIP_CHECK=1
+export BITNET_CACHE_TRAIN=0
 
 export N_EMBD=384
 export FF_LAYERS=8
@@ -27,9 +28,9 @@ export MEMORY_TOKENS=0
 export USE_ENGRAM=0
 export CPU_HASH_CTX=0
 
-python train_ff_only_ternary_ema.py \
+python scripts/training/train_ff_only_ternary_ema.py \
   --data-dir data/ternary_tinystories \
-  --out-dir runs/ff_ternary_ema_tiny_roundtrip_test \
+  --out-dir runs/ff_ternary_ema_tiny_roundtrip_clearcache \
   --vocab-size 16000 \
   --steps 1500 \
   --eval-every 250 \

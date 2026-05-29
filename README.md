@@ -7,22 +7,24 @@ This is research code. It is meant for experimentation and inspection, not as a 
 ## Key Ideas
 
 - **FF/BP model layout:** `HebbianFF.model.FF_LLM` builds a stack of FF blocks plus optional BP/correction blocks. The current block implementation is a full-width residual decoder block; `RevBlock` remains as a compatibility alias.
-- **Ternary / BitNet training path:** `HebbianFF.bitnet.BitLinear` and `train_ff_only_ternary_ema.py` support FF-only ternary training with EMA-triggered auxiliary losses.
+- **Ternary / BitNet training path:** `HebbianFF.bitnet.BitLinear` and `scripts/training/train_ff_only_ternary_ema.py` support FF-only ternary training with EMA-triggered auxiliary losses.
 - **Hugging Face retrofit path:** `tools/import_hf.py` imports selected HF decoder checkpoints into the local `FF_LLM` checkpoint format for parity and retrofit experiments.
-- **Inference and serving:** `chat_hf.py` provides local checkpoint chat/inference. `web_chat.py` and `web_chat/server.py` provide web serving paths.
+- **Inference and serving:** `scripts/inference/chat_hf.py` provides local checkpoint chat/inference. `scripts/inference/web_chat.py` and `web_chat/server.py` provide web serving paths.
 - **Packed ternary runtime:** `HebbianFF.ternary_runtime`, `tools/transfer_to_1bit.py`, and the ternary repair/eval scripts explore compact packed weights and repaired ternary adapters.
 - **Low-VRAM experiments:** bounded KV cache, sink tokens, CPU offload helpers, packed linears, and benchmarking scripts are included, but many paths are explicitly experimental.
 
 ## Folder Structure
 
 ```text
-HebbianFF/      Core model, blocks, config, BitNet layers, packed runtimes, memory helpers
-scripts/               Small wrappers for importing/checking models and launching the local server
-tools/                 Import, evaluation, compression, ternary repair, benchmark, and diagnostic tools
+HebbianFF/             Core model, blocks, config, BitNet layers, packed runtimes, memory helpers
+scripts/dataset_builders/          Dataset preparation scripts
+scripts/training/      Training entry points, launchers, resume helpers, and smoke tests
+scripts/benchmarks/    CPU/GPU benchmark launchers
+scripts/inference/     Local chat and legacy Flask web-chat entry points
+scripts/               Import/check/server wrappers
+tools/                 Import, evaluation, compression, ternary repair, and diagnostic tools
 docs/                  Research notes and runtime/evaluation documentation
 web_chat/              FastAPI web-chat server and static UI
-*.py                   Training, inference, data preparation, evaluation, and serving entry points
-*.sh                   Launchers for TinyStories, FineWeb-Edu, CPU/GPU benchmarking, and smoke tests
 ```
 
 ## Requirements
@@ -61,7 +63,7 @@ For CUDA builds, install the PyTorch wheel that matches your driver before insta
 ### Build a small TinyStories-style dataset
 
 ```bash
-python build_safe_pretrain_data.py \
+python scripts/dataset_builders/build_safe_pretrain_data.py \
   --dataset roneneldan/TinyStories \
   --out-dir data/ternary_tinystories \
   --vocab-size 16000 \
@@ -73,7 +75,7 @@ python build_safe_pretrain_data.py \
 ### Train a small FF-only ternary EMA model
 
 ```bash
-./run_3070_tinystories.sh --preset tiny
+./scripts/training/run_3070_tinystories.sh --preset tiny
 ```
 
 The launcher expects `data/ternary_tinystories/train.bin` and `val.bin` and writes checkpoints/metrics under `runs/`.
@@ -83,7 +85,7 @@ The launcher expects `data/ternary_tinystories/train.bin` and `val.bin` and writ
 ```bash
 TARGET_TRAIN_TOKENS=1000000000 \
 TARGET_VAL_TOKENS=10000000 \
-./build_fineweb_edu_500m_data.sh
+./scripts/dataset_builders/build_fineweb_edu_500m_data.sh
 ```
 
 The default script target is much larger, so set token limits deliberately before running it.
@@ -91,13 +93,13 @@ The default script target is much larger, so set token limits deliberately befor
 ### Launch the 500M-style FineWeb-Edu training config
 
 ```bash
-./run_500m_fineweb_edu.sh
+./scripts/training/run_500m_fineweb_edu.sh
 ```
 
 For CPU-oriented experiments:
 
 ```bash
-./run_500m_cpu_efficient.sh
+./scripts/training/run_500m_cpu_efficient.sh
 ```
 
 ### Import a Hugging Face checkpoint
@@ -118,7 +120,7 @@ Then check it:
 ### Run local chat from an imported checkpoint
 
 ```bash
-USE_KV_CACHE=1 python chat_hf.py \
+USE_KV_CACHE=1 python scripts/inference/chat_hf.py \
   --checkpoint models/qwen25-1.5b-ff.pt \
   --tokenizer Qwen/Qwen2.5-1.5B-Instruct
 ```

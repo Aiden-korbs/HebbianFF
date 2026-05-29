@@ -10,6 +10,13 @@ import time
 from pathlib import Path
 from types import SimpleNamespace
 from typing import Dict, List, Any, Tuple
+import sys
+
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+INFERENCE_DIR = PROJECT_ROOT / "scripts" / "inference"
+for path in (PROJECT_ROOT, INFERENCE_DIR):
+    if str(path) not in sys.path:
+        sys.path.insert(0, str(path))
 
 import torch
 import torch.nn.functional as F

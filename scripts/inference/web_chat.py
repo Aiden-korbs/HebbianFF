@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-web_chat.py  —  Browser front-end for FF_LLM / chat_hf models.
+scripts/inference/web_chat.py  —  Browser front-end for FF_LLM / chat_hf models.
 
 Defaults follow the "Current Best Path" in architecture_plan.md:
   USE_KV_CACHE=1, KV_CACHE_INT8=0, INFER_MEMORY_TOKENS=0,
@@ -8,7 +8,7 @@ Defaults follow the "Current Best Path" in architecture_plan.md:
 
 Usage:
   pip install flask
-  python web_chat.py \\
+  python scripts/inference/web_chat.py \\
       --checkpoint models/Qwen2.5-Coder-0.5B-Instruct.pt \\
       --tokenizer  Qwen/Qwen2.5-Coder-0.5B-Instruct
 
@@ -37,7 +37,7 @@ os.environ.setdefault("DRAFT_BLEND_BP",      "0")
 os.environ.setdefault("KV_CACHE_INT8",       "0")
 # KV_CACHE_MAX_LEN / KV_CACHE_SINK_TOKENS are set after arg parsing (see main())
 
-PROJECT_ROOT = Path(__file__).resolve().parent
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 

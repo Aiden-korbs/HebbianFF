@@ -518,7 +518,7 @@ def main():
     from HebbianFF.config import CFG
     from HebbianFF.model import FF_LLM
 
-    # no_init_weights is defined in chat_hf.py; replicate it here
+    # no_init_weights is defined in scripts/inference/chat_hf.py; replicate it here
     import torch.nn.init as _init
     _noop = lambda t, *a, **kw: t
     _saved = {n: getattr(_init, n) for n in dir(_init) if callable(getattr(_init, n)) and n.endswith("_")}
@@ -609,7 +609,7 @@ def main():
     print("  Done.")
     print(f"\n  Next steps:")
     print(f"    Sanity check  :  ./scripts/check_model.sh {out_path}")
-    print(f"    Quick chat    :  USE_KV_CACHE=1 python chat_hf.py \\")
+    print(f"    Quick chat    :  USE_KV_CACHE=1 python scripts/inference/chat_hf.py \\")
     print(f"                       --checkpoint {out_path} \\")
     print(f"                       --tokenizer <your_tokenizer_path>")
     print(f"    Enable draft  :  USE_DRAFT_HEAD=1 (add to your training env)")

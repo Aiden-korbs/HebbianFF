@@ -12,7 +12,7 @@ default init. This script does that explicitly and saves the result so
 training / eval can start from a known seed.
 
 Usage:
-  python seed_features.py \
+  python tools/seed_features.py \
     --checkpoint models/DeepSeek-R1-Distill-Qwen-1.5B-bs8192-bf16.pt \
     --features draft,memory,engram,cpuctx \
     --out models/seeded_draft_memory_engram_cpuctx.pt \
@@ -26,8 +26,11 @@ import os
 import sys
 from pathlib import Path
 
-PROJECT_ROOT = Path(__file__).resolve().parent
-sys.path.insert(0, str(PROJECT_ROOT))
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+INFERENCE_DIR = PROJECT_ROOT / "scripts" / "inference"
+for path in (PROJECT_ROOT, INFERENCE_DIR):
+    if str(path) not in sys.path:
+        sys.path.insert(0, str(path))
 
 import torch
 import chat_hf

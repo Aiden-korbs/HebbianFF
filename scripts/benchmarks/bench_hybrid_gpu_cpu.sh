@@ -52,7 +52,7 @@ run_case() {
   if command -v nvidia-smi >/dev/null 2>&1; then
     nvidia-smi --query-gpu=utilization.gpu,memory.used,memory.total --format=csv,noheader,nounits || true
   fi
-  env "${common_env[@]}" OUT_DIR="runs/tmp_hybrid_bench_${name}" "$@" ./run_500m_fineweb_edu.sh --no-bnb
+  env "${common_env[@]}" OUT_DIR="runs/tmp_hybrid_bench_${name}" "$@" ./scripts/training/run_500m_fineweb_edu.sh --no-bnb
   if command -v nvidia-smi >/dev/null 2>&1; then
     nvidia-smi --query-gpu=utilization.gpu,memory.used,memory.total --format=csv,noheader,nounits || true
   fi

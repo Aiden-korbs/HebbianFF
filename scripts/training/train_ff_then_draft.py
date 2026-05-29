@@ -11,6 +11,13 @@ import time
 from dataclasses import asdict, is_dataclass
 from pathlib import Path
 from types import SimpleNamespace
+import sys
+
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+INFERENCE_DIR = PROJECT_ROOT / "scripts" / "inference"
+for path in (PROJECT_ROOT, INFERENCE_DIR):
+    if str(path) not in sys.path:
+        sys.path.insert(0, str(path))
 
 import torch
 import torch.nn.functional as F

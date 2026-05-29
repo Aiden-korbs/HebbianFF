@@ -8,7 +8,7 @@ OUT_DIR="${OUT_DIR:-runs/ff_ternary_ema_fineweb_500m}"
 
 [[ -f "$DATA_DIR/train.bin" && -f "$DATA_DIR/val.bin" ]] || {
   echo "Missing $DATA_DIR/train.bin or val.bin. Build data first:"
-  echo "  ./build_fineweb_edu_500m_data.sh"
+  echo "  ./scripts/dataset_builders/build_fineweb_edu_500m_data.sh"
   exit 1
 }
 
@@ -40,7 +40,7 @@ export MEMORY_TOKENS="${MEMORY_TOKENS:-0}"
 export USE_ENGRAM="${USE_ENGRAM:-0}"
 export CPU_HASH_CTX="${CPU_HASH_CTX:-0}"
 
-"${PYTHON_BIN:-python}" train_ff_only_ternary_ema.py \
+"${PYTHON_BIN:-python}" scripts/training/train_ff_only_ternary_ema.py \
   --data-dir "$DATA_DIR" \
   --out-dir "$OUT_DIR" \
   --vocab-size "${VOCAB_SIZE:-32768}" \

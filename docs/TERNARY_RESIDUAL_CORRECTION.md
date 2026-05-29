@@ -70,7 +70,7 @@ SELECTIVE_MLP_TOPK=18944 \
 SELECTIVE_MLP_SCORE=last \
 SELECTIVE_MLP_DEBUG=1 \
 PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True \
-python chat_hf.py \
+python scripts/inference/chat_hf.py \
   --checkpoint ./models/DeepSeek-R1-Distill-Qwen-7B-ff28-updown-tri-r128.pt \
   --tokenizer ./models/hf/DeepSeek-R1-Distill-Qwen-7B \
   --dtype bf16 \

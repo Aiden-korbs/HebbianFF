@@ -26,7 +26,7 @@ DEFAULT_PROMPTS = [
 
 
 def parse_args() -> argparse.Namespace:
-    p = argparse.ArgumentParser(description="Smoke compare dense and packed generation through chat_hf.py.")
+    p = argparse.ArgumentParser(description="Smoke compare dense and packed generation through scripts/inference/chat_hf.py.")
     p.add_argument("--dense-checkpoint", default=None)
     p.add_argument("--packed-checkpoint", required=True)
     p.add_argument("--tokenizer", required=True)

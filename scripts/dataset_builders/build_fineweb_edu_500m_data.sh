@@ -15,7 +15,7 @@ TOKENIZER_DOCS="${TOKENIZER_DOCS:-1000000}"
 TARGET_TRAIN_TOKENS="${TARGET_TRAIN_TOKENS:-10000000000}"
 TARGET_VAL_TOKENS="${TARGET_VAL_TOKENS:-50000000}"
 
-python build_large_pretrain_data.py \
+python scripts/dataset_builders/build_large_pretrain_data.py \
   --dataset HuggingFaceFW/fineweb-edu \
   --config sample-10BT \
   --split train \

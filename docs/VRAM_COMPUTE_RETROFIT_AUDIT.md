@@ -64,26 +64,26 @@ Blunt assessment: if the target is preserving intelligence, attention replacemen
 
 ### Training and adaptation
 
-- `train_ff_draft_repair.py`
+- `scripts/training/train_ff_draft_repair.py`
   - Fine-tunes selected subsets of an imported/custom checkpoint.
   - Supports modes `draft`, `draft_head`, `bp_draft_head`, and `all`.
   - Freezes most weights by default and adapts selected heads/BP modules.
 
-- `train_ff_then_draft.py`
+- `scripts/training/train_ff_then_draft.py`
   - Two-stage training script.
   - Stage `ff`: trains FF blocks only.
   - Stage `draft`: trains draft head only from frozen FF hidden states.
 
 ### Inference and serving
 
-- `chat_hf.py`
+- `scripts/inference/chat_hf.py`
   - Loads local `FF_LLM` checkpoints.
   - Uses HF tokenizer.
   - Supports `USE_KV_CACHE=1` through `prefill_kv` and `decode_one_kv`.
   - Generates one token at a time with optional sampling controls.
 
 - `web_chat/server.py`
-  - FastAPI wrapper around `chat_hf.py`.
+  - FastAPI wrapper around `scripts/inference/chat_hf.py`.
   - Sets stable runtime defaults: KV cache on, draft head off, memory/engram off.
 
 - `web_chat/static/index.html`
@@ -112,7 +112,7 @@ Blunt assessment: if the target is preserving intelligence, attention replacemen
 - `ff_llm_spm.vocab`
   - SentencePiece vocab artifact, but current runtime expects an HF tokenizer path or model id.
 
-- `chat_hf.py`, `compare_native_qwen_eval.py`, and training scripts use `transformers.AutoTokenizer`.
+- `scripts/inference/chat_hf.py`, `tools/compare_native_qwen_eval.py`, and training scripts use `transformers.AutoTokenizer`.
 
 - Data directories present but not audited deeply:
   - `data_qwen_repair/`
@@ -121,7 +121,7 @@ Blunt assessment: if the target is preserving intelligence, attention replacemen
 
 ### Evaluation
 
-- `compare_native_qwen_eval.py`
+- `tools/compare_native_qwen_eval.py`
   - Compares a custom checkpoint against native HF Qwen on multiple-choice tasks.
   - Records accuracy and peak allocated CUDA memory.
   - Useful but not sufficient for retrofit audit because it does not yet measure KL divergence, top-k agreement, KV memory, prefill tok/s, or decode tok/s.
@@ -130,9 +130,9 @@ Blunt assessment: if the target is preserving intelligence, attention replacemen
 
 | Idea | Classification | Pretrained weights untouched | New modules required | No-op init possible | VRAM savings | Compute savings | Quality risk | Difficulty | Repo implementation points |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| Preserve imported HF layers exactly in `FF_LLM` and add no-op sidecars | Inference-only baseline / requires short adaptation for sidecars | All imported layer weights, embeddings, lm head | Optional gates/projections/sidecars | Yes | None initially | None initially | Low if all sidecars gated off | Low | `tools/import_hf.py`, `model.py`, `chat_hf.py` |
+| Preserve imported HF layers exactly in `FF_LLM` and add no-op sidecars | Inference-only baseline / requires short adaptation for sidecars | All imported layer weights, embeddings, lm head | Optional gates/projections/sidecars | Yes | None initially | None initially | Low if all sidecars gated off | Low | `tools/import_hf.py`, `model.py`, `scripts/inference/chat_hf.py` |
 | Bounded KV cache / sliding window using current `max_cache_len` | Inference-only retrofit | All weights | None | Already available | High at long context | Moderate at long decode due smaller attention over cache | Medium: loses old context | Low | `RevGQACausalAttention.forward_kv`, `FF_LLM.prefill_kv`, `decode_one_kv`, `CFG.block_size` |
-| Quantized KV cache | Inference-only retrofit | All weights | KV quant/dequant wrapper, cache dtype metadata | Near no-op if disabled; exact no-op impossible when quantized | High, roughly 2x for int8 KV or 4x for int4 KV cache | Mixed: memory bandwidth can improve, dequant overhead can hurt | Low-medium for int8, medium-high for int4 | Medium | `blocks.py` KV cache path, `chat_hf.py` metrics |
+| Quantized KV cache | Inference-only retrofit | All weights | KV quant/dequant wrapper, cache dtype metadata | Near no-op if disabled; exact no-op impossible when quantized | High, roughly 2x for int8 KV or 4x for int4 KV cache | Mixed: memory bandwidth can improve, dequant overhead can hurt | Low-medium for int8, medium-high for int4 | Medium | `blocks.py` KV cache path, `scripts/inference/chat_hf.py` metrics |
 | CPU/offloaded KV cache for old tokens | Inference-only retrofit | All weights | Cache manager, pinned CPU buffers, async transfer, attention split | Yes when disabled | High GPU VRAM savings | Usually slower unless long context and careful paging | Low if exact KV is preserved; latency risk high | Medium-high | `blocks.py` forward_kv cache format, `model.py` cache dict |
 | CPU hash context replacing distant KV | Requires short adaptation | Base weights frozen | CPU hash compressor, projection, learned gate | Yes if gate init near zero | Medium-high at long context if old KV dropped | Moderate if it avoids long attention | Medium-high; compressed memory is not behavior-preserving | Medium | Existing `use_cpu_hash_context`, `cpu_ctx_proj`, `forward_features`; missing KV decode integration |
 | CPU SSM context replacing distant KV | Requires short adaptation / finetune-only retrofit | Base weights can stay frozen | Actual CPU SSM module, projection/gate, training loss | Yes if gate zero | Medium-high at long context | Possibly moderate | High; SSM summary is not equivalent to transformer KV | High | Config scaffolding in `config.py`; concrete module absent |
@@ -140,11 +140,11 @@ Blunt assessment: if the target is preserving intelligence, attention replacemen
 | Engram recurrent memory as alternative to full attention | Requires full retraining for strong use; short adaptation only as weak sidecar | Base weights can stay frozen if gate tiny | `EngramMemoryBank`, key/value projections, gate | Yes with gate near zero | Low-medium unless KV is actually removed | Low-medium | High; retrieval can inject wrong latent state | Medium-high | `memory.py`, `model.forward_features` |
 | Replace selected attention layers with SSM/context modules | Requires full retraining | Some original non-attention weights can stay, replaced attention weights unused | SSM blocks, projection bridges, distillation losses | Residual gate can be no-op, but replacement is not no-op once used | Medium-high if attention/KV removed | Medium-high at long contexts | Very high | High | New block type in `blocks.py`, config routing, import mapping |
 | Draft head sidecar for speculative decoding | Requires short adaptation | Original model untouched | Small draft model/head, verification path | Yes if disabled; draft logits need training | Little VRAM saving; may add VRAM | Decode compute savings if accepted tokens are high | Low if verifier is original model | Medium | Existing `FFDraftHead`; generation lacks speculative verifier loop |
-| FF draft head as replacement for final decode | Finetune-only retrofit / unlikely for preservation | Base can freeze | Draft head | No exact no-op unless disabled | None or negative unless skipping BP/layers | Potential large savings if skipping heavy path | High; unverified draft tokens degrade intelligence | Medium | `memory.FFDraftHead`, `train_ff_then_draft.py`, `chat_hf.py` |
+| FF draft head as replacement for final decode | Finetune-only retrofit / unlikely for preservation | Base can freeze | Draft head | No exact no-op unless disabled | None or negative unless skipping BP/layers | Potential large savings if skipping heavy path | High; unverified draft tokens degrade intelligence | Medium | `memory.FFDraftHead`, `scripts/training/train_ff_then_draft.py`, `scripts/inference/chat_hf.py` |
 | Selective layer execution / layer skipping | Requires short adaptation | Skipped layers untouched but unused on some tokens | Confidence router/gates, calibration loss | Yes if route always executes all layers | Medium activation/KV savings if layers skipped | Medium-high | High without verifier/correction | Medium-high | `model.decode_one_kv`, `ResidualBlock`, generation loop |
-| Early exit / confidence routing | Requires short adaptation | Lower layers and head untouched; later layers skipped sometimes | Intermediate heads or shared head projections, confidence metric | Yes if threshold never exits | Medium compute savings | Medium-high when exits frequent | High for hard tokens | Medium-high | Add intermediate logits in `model.py`, routing in `chat_hf.py` |
-| Sparse correction BP blocks | Requires short adaptation | Imported FF/base weights frozen | Zero-init BP/correction blocks, router | Yes, BP output projections already zero-init in constructor | VRAM negative unless replacing skipped layers | Compute savings only if correction rare and base path cheaper | Medium | Medium | Existing BP blocks in `model.py`, `train_ff_draft_repair.py` |
-| FF-only or mostly-FF pass with BP correction when needed | Requires short adaptation / finetune-only | FF/imported weights can stay; BP trained | Router, BP correction blocks, draft/confidence signal | Yes if BP zero or router off | Possible if BP skipped most tokens | Possible if BP rare | Medium-high | Medium | `ff_blocks`, `bp_blocks`, `ff_draft_head`, `train_ff_draft_repair.py` |
+| Early exit / confidence routing | Requires short adaptation | Lower layers and head untouched; later layers skipped sometimes | Intermediate heads or shared head projections, confidence metric | Yes if threshold never exits | Medium compute savings | Medium-high when exits frequent | High for hard tokens | Medium-high | Add intermediate logits in `model.py`, routing in `scripts/inference/chat_hf.py` |
+| Sparse correction BP blocks | Requires short adaptation | Imported FF/base weights frozen | Zero-init BP/correction blocks, router | Yes, BP output projections already zero-init in constructor | VRAM negative unless replacing skipped layers | Compute savings only if correction rare and base path cheaper | Medium | Medium | Existing BP blocks in `model.py`, `scripts/training/train_ff_draft_repair.py` |
+| FF-only or mostly-FF pass with BP correction when needed | Requires short adaptation / finetune-only | FF/imported weights can stay; BP trained | Router, BP correction blocks, draft/confidence signal | Yes if BP zero or router off | Possible if BP skipped most tokens | Possible if BP rare | Medium-high | Medium | `ff_blocks`, `bp_blocks`, `ff_draft_head`, `scripts/training/train_ff_draft_repair.py` |
 | Adapters initialized as no-op | Requires short adaptation | All original weights frozen | LoRA/adapters in attention/MLP or memory bridges | Yes | None by itself | None by itself | Low | Low-medium | Add adapters to `blocks.py` projections or wrapper modules |
 | Low-rank projection bridges for context/memory | Requires short adaptation | Base weights frozen | Down/up projections and gate | Yes with zero/up gate | Low-medium depending on use | Low-medium | Medium | Low-medium | `cpu_ctx_proj`, possible LoRA-style additions |
 | BitNet conversion of imported weights | Requires full retraining or heavy quantization-aware adaptation | Float weights may be latent, but behavior changes | `BitLinear` already exists | No, quantization is not identity | High for weights if stored/served quantized | Not guaranteed in current PyTorch implementation | High for post-training conversion | Medium | `bitnet.py`, `make_linear`, `CFG.use_bitnet` |
@@ -385,7 +385,7 @@ Use small, fast evals:
 - PIQA subset.
 - A small handcrafted code/reasoning set committed outside model code or generated as JSONL.
 
-The existing `compare_native_qwen_eval.py` can be extended for this, but it currently measures accuracy and peak memory only. It needs added logit-parity and speed/KV metrics for this research question.
+The existing `tools/compare_native_qwen_eval.py` can be extended for this, but it currently measures accuracy and peak memory only. It needs added logit-parity and speed/KV metrics for this research question.
 
 ## Suggested Implementation Locations After Approval
 
@@ -406,7 +406,7 @@ No implementation was done in this audit. If approved, the lowest-risk code addi
    - Minimal changes only inside `forward_kv` cache handling.
    - Preserve existing unquantized path as exact baseline.
 
-4. `chat_hf.py`
+4. `scripts/inference/chat_hf.py`
    - Add benchmark-friendly generation hooks.
    - Later add speculative verification loop.
 

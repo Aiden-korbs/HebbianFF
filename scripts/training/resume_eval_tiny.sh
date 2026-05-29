@@ -23,7 +23,7 @@ export MEMORY_TOKENS=0
 export USE_ENGRAM=0
 export CPU_HASH_CTX=0
 
-python train_ff_only_ternary_ema.py \
+python scripts/training/train_ff_only_ternary_ema.py \
   --data-dir data/ternary_tinystories \
   --out-dir runs/ff_ternary_ema_tiny_resume_eval_test \
   --resume-from runs/ff_ternary_ema_tiny_d384_l8_ctx512_20260524_220044/best.pt \

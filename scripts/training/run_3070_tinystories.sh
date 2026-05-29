@@ -3,9 +3,9 @@ set -Eeuo pipefail
 
 # FF-only ternary EMA launcher for a 3070-class 8GB GPU.
 # Usage:
-#   ./run_3070_tinystories.sh --preset tiny
-#   ./run_3070_tinystories.sh --preset small --steps 10000
-#   N_EMBD=768 FF_LAYERS=10 BATCH_SIZE=2 GRAD_ACCUM=16 ./run_3070_tinystories.sh
+#   ./scripts/training/run_3070_tinystories.sh --preset tiny
+#   ./scripts/training/run_3070_tinystories.sh --preset small --steps 10000
+#   N_EMBD=768 FF_LAYERS=10 BATCH_SIZE=2 GRAD_ACCUM=16 ./scripts/training/run_3070_tinystories.sh
 
 # ----------------------------- UI helpers -----------------------------
 if [[ -t 1 && -z "${NO_COLOR:-}" ]]; then
@@ -40,7 +40,7 @@ Options:
   -h, --help                   Show this help
 
 Environment overrides still work, for example:
-  N_EMBD=512 FF_LAYERS=10 BATCH_SIZE=6 GRAD_ACCUM=8 ./run_3070_tinystories.sh --preset small
+  N_EMBD=512 FF_LAYERS=10 BATCH_SIZE=6 GRAD_ACCUM=8 ./scripts/training/run_3070_tinystories.sh --preset small
 
 Useful env toggles:
   USE_BITNET_QUANT_ACT=1       Try quantised activations after the stable run works
@@ -101,9 +101,9 @@ case "$PRESET" in
 esac
 
 # ----------------------------- Required files -----------------------------
-[[ -f train_ff_only_ternary_ema.py ]] || fatal "train_ff_only_ternary_ema.py not found. Run from the repo root."
+[[ -f scripts/training/train_ff_only_ternary_ema.py ]] || fatal "scripts/training/train_ff_only_ternary_ema.py not found. Run from the repo root."
 [[ -f "$DATA_DIR/train.bin" && -f "$DATA_DIR/val.bin" ]] || fatal "Missing $DATA_DIR/train.bin or val.bin. Build data first, e.g.:
-python build_safe_pretrain_data.py \\
+python scripts/dataset_builders/build_safe_pretrain_data.py \\
   --dataset roneneldan/TinyStories \\
   --out-dir $DATA_DIR \\
   --vocab-size $VOCAB_SIZE \\
@@ -205,7 +205,7 @@ if command -v nvidia-smi >/dev/null 2>&1; then
     | awk -F, '{printf "  gpu                       %s | %s/%s MiB | util %s%% | temp %sC | power %sW\n", $1,$2,$3,$4,$5,$6}'
 fi
 
-CMD=(python train_ff_only_ternary_ema.py
+CMD=(python scripts/training/train_ff_only_ternary_ema.py
   --data-dir "$DATA_DIR"
   --out-dir "$OUT_DIR"
   --vocab-size "$VOCAB_SIZE"

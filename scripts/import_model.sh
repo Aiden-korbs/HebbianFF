@@ -38,7 +38,7 @@
 #     ./scripts/check_model.sh models/<model_name>.pt
 #
 #   Run a quick chat to confirm it works:
-#     USE_KV_CACHE=1 python chat_hf.py \
+#     USE_KV_CACHE=1 python scripts/inference/chat_hf.py \
 #       --checkpoint models/<model_name>.pt \
 #       --tokenizer Qwen/Qwen2.5-1.5B-Instruct
 #

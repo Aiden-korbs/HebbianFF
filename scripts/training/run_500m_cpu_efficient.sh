@@ -43,7 +43,7 @@ export TORCH_COMPILE="${TORCH_COMPILE:-0}"
 export CPUSET="${CPUSET:-0,2,4,6,8,10,12,14}"
 
 if [[ -n "${CPUSET}" ]] && command -v taskset >/dev/null 2>&1; then
-  exec taskset -c "${CPUSET}" ./run_500m_fineweb_edu.sh "$@"
+  exec taskset -c "${CPUSET}" ./scripts/training/run_500m_fineweb_edu.sh "$@"
 fi
 
-exec ./run_500m_fineweb_edu.sh "$@"
+exec ./scripts/training/run_500m_fineweb_edu.sh "$@"

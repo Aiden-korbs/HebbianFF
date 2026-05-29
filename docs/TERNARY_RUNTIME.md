@@ -52,7 +52,7 @@ Low VRAM:
 
 ```bash
 TERNARY_PRESET=low_vram \
-/home/corbs/venvs/ffllm/bin/python chat_hf.py \
+/home/corbs/venvs/ffllm/bin/python scripts/inference/chat_hf.py \
   --checkpoint tinyllama_ffbp_fullres_llama.pt \
   --ternary-adapter ternary_repair_runs/tinyllama_ternary_lora_gate_up_rank16.pt \
   --tokenizer TinyLlama/TinyLlama-1.1B-Chat-v1.0
@@ -63,7 +63,7 @@ Balanced:
 ```bash
 TERNARY_PRESET=balanced \
 TERNARY_SELECTIVE_DENSE_PROFILE=ternary_repair_runs/ternary_runtime_profile.json \
-/home/corbs/venvs/ffllm/bin/python chat_hf.py \
+/home/corbs/venvs/ffllm/bin/python scripts/inference/chat_hf.py \
   --checkpoint tinyllama_ffbp_fullres_llama.pt \
   --ternary-adapter ternary_repair_runs/tinyllama_ternary_lora_gate_up_rank16.pt \
   --tokenizer TinyLlama/TinyLlama-1.1B-Chat-v1.0
@@ -74,7 +74,7 @@ Speed:
 ```bash
 TERNARY_PRESET=speed \
 TERNARY_SELECTIVE_DENSE_PROFILE=ternary_repair_runs/ternary_runtime_profile.json \
-/home/corbs/venvs/ffllm/bin/python chat_hf.py \
+/home/corbs/venvs/ffllm/bin/python scripts/inference/chat_hf.py \
   --checkpoint tinyllama_ffbp_fullres_llama.pt \
   --ternary-adapter ternary_repair_runs/tinyllama_ternary_lora_gate_up_rank16.pt \
   --tokenizer TinyLlama/TinyLlama-1.1B-Chat-v1.0

@@ -5,7 +5,7 @@ Build large clean uint16 pretraining bins for FF/BP ternary runs.
 The default source is FineWeb-Edu sample-10BT.  The script streams from
 Hugging Face datasets, applies conservative text-quality filters, trains a
 ByteLevel BPE tokenizer, and writes train.bin / val.bin in the format expected
-by train_ff_only_ternary_ema.py.
+by scripts/training/train_ff_only_ternary_ema.py.
 """
 from __future__ import annotations
 
