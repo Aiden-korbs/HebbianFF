@@ -18,14 +18,14 @@ import torch.nn.functional as F
 from transformers import AutoTokenizer
 
 try:
-    from ffbp_ema_cpu_ssm import env as _repo_env  # noqa: F401
+    from HebbianFF import env as _repo_env  # noqa: F401
 except Exception:
     pass
 
-from ffbp_ema_cpu_ssm.config import CFG
-from ffbp_ema_cpu_ssm.model import FF_LLM
-from ffbp_ema_cpu_ssm.packed import CpuOffloadedEmbedding, CpuOffloadedLinear, is_packed_entry, replace_packed_linears
-from ffbp_ema_cpu_ssm.ternary_runtime import PackedTernaryLoRALinear, resolved_runtime_config
+from HebbianFF.config import CFG
+from HebbianFF.model import FF_LLM
+from HebbianFF.packed import CpuOffloadedEmbedding, CpuOffloadedLinear, is_packed_entry, replace_packed_linears
+from HebbianFF.ternary_runtime import PackedTernaryLoRALinear, resolved_runtime_config
 
 
 def _get_child(module: torch.nn.Module, name: str) -> torch.nn.Module:

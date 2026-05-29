@@ -19,8 +19,8 @@ import torch.nn.functional as F
 from transformers import AutoTokenizer
 
 from chat_hf import cfg_from_ckpt, dtype_from_name, no_init_weights
-from ffbp_ema_cpu_ssm.config import CFG
-from ffbp_ema_cpu_ssm.model import FF_LLM
+from HebbianFF.config import CFG
+from HebbianFF.model import FF_LLM
 from tools.sensitivity_compression_scan import (
     block_index,
     get_child,

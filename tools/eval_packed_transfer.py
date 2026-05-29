@@ -18,9 +18,9 @@ import torch.nn.functional as F
 from transformers import AutoTokenizer
 
 from chat_hf import cfg_from_ckpt, no_init_weights
-from ffbp_ema_cpu_ssm.config import CFG
-from ffbp_ema_cpu_ssm.model import FF_LLM
-from ffbp_ema_cpu_ssm.packed import is_packed_entry, replace_packed_linears
+from HebbianFF.config import CFG
+from HebbianFF.model import FF_LLM
+from HebbianFF.packed import is_packed_entry, replace_packed_linears
 
 
 def dtype_from_name(name: str, device: str) -> torch.dtype:

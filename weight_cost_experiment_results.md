@@ -227,7 +227,7 @@ Interpretation:
 
 Implemented files:
 
-- `ffbp_ema_cpu_ssm/packed.py`
+- `HebbianFF/packed.py`
 - `tools/transfer_to_1bit.py`
 - `tools/eval_packed_transfer.py`
 

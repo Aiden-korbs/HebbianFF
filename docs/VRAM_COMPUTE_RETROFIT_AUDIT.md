@@ -22,40 +22,40 @@ Blunt assessment: if the target is preserving intelligence, attention replacemen
 
 ### Core model and blocks
 
-- `ffbp_ema_cpu_ssm/model.py`
+- `HebbianFF/model.py`
   - Defines `FF_LLM`.
   - Builds token embeddings, FF blocks, BP blocks, optional draft head, optional chunk memory compressor, optional engram memory, optional CPU hash context projection, final norm/projection/head.
   - Contains training forward path `forward_features`.
   - Contains KV-cache inference path `prefill_kv` and `decode_one_kv`.
   - Contains eval helpers `eval_metrics` and `generate`.
 
-- `ffbp_ema_cpu_ssm/blocks.py`
+- `HebbianFF/blocks.py`
   - Defines RoPE helpers.
   - Defines `RevGQACausalAttention`, despite the name this is standard full-width GQA causal attention.
   - Supports local-window attention when used as FF block attention, full block-size attention for BP blocks.
   - Implements KV-cache attention in `forward_kv`.
   - Defines `ResidualBlock`; `RevBlock` is now just a backwards-compatible alias.
 
-- `ffbp_ema_cpu_ssm/memory.py`
+- `HebbianFF/memory.py`
   - Defines `FFDraftHead`.
   - Defines `ChunkMemoryCompressor`.
   - Defines `EngramMemoryBank`.
 
-- `ffbp_ema_cpu_ssm/bitnet.py`
+- `HebbianFF/bitnet.py`
   - Defines `BitLinear`, a ternary/1.58-bit linear layer with activation quantization.
   - Intended as a training/inference architecture option, not currently a calibrated post-training transformer quantizer.
 
-- `ffbp_ema_cpu_ssm/utils.py`
+- `HebbianFF/utils.py`
   - RMSNorm fallback, seeding, AMP helpers, scheduler helpers.
 
-- `ffbp_ema_cpu_ssm/config.py`
+- `HebbianFF/config.py`
   - Central config dataclass.
   - Includes architecture size, FF/BP layer counts, GQA counts, RoPE, local window, chunk memory, CPU context/CPU hash context, FF EMA BP, engram, draft head, BitNet, eval, and training knobs.
 
 ### Attention, SSM, memory, engram
 
-- Attention is in `ffbp_ema_cpu_ssm/blocks.py`.
-- Chunk memory and engram memory are in `ffbp_ema_cpu_ssm/memory.py`.
+- Attention is in `HebbianFF/blocks.py`.
+- Chunk memory and engram memory are in `HebbianFF/memory.py`.
 - CPU-side context is represented in config and model as:
   - `CPU_CTX_MODE=ssm` / `use_cpu_context_ssm`
   - `CPU_HASH_CTX=1` / `use_cpu_hash_context`
@@ -396,13 +396,13 @@ No implementation was done in this audit. If approved, the lowest-risk code addi
    - Loads native HF and imported/custom model.
    - Reports VRAM, KV bytes, prefill tok/s, decode tok/s, perplexity, KL, top-k agreement, and sample generations.
 
-2. `ffbp_ema_cpu_ssm/kv_cache.py`
+2. `HebbianFF/kv_cache.py`
    - New cache utilities:
      - byte accounting,
      - optional int8 quant/dequant,
      - optional CPU offload manager.
 
-3. `ffbp_ema_cpu_ssm/blocks.py`
+3. `HebbianFF/blocks.py`
    - Minimal changes only inside `forward_kv` cache handling.
    - Preserve existing unquantized path as exact baseline.
 

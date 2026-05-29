@@ -12,7 +12,7 @@ The name fits because the active repo combines ternary/BitNet training and packe
 
 Copied source and project files:
 
-- Core package: `ffbp_ema_cpu_ssm/`
+- Core package: `HebbianFF/`
 - Tooling: `tools/`
 - Web server package: `web_chat/`
 - Documentation: `docs/`, `architecture_plan.md`, `weight_cost_experiment_results.md`

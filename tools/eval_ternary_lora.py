@@ -15,7 +15,7 @@ import torch
 import torch.nn.functional as F
 from transformers import AutoTokenizer
 
-from ffbp_ema_cpu_ssm.ternary_runtime import PackedTernaryLoRALinear, current_ternary_runtime, resolved_runtime_config
+from HebbianFF.ternary_runtime import PackedTernaryLoRALinear, current_ternary_runtime, resolved_runtime_config
 from tools.repair_ternary_lora import load_model
 from tools.sensitivity_compression_scan import get_child, set_child, topk_agreement
 

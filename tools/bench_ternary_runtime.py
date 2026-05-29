@@ -15,7 +15,7 @@ if str(PROJECT_ROOT) not in sys.path:
 import torch
 import torch.nn.functional as F
 
-from ffbp_ema_cpu_ssm.ternary_runtime import TERNARY_RUNTIME_MODES, reset_auto_dense_budget
+from HebbianFF.ternary_runtime import TERNARY_RUNTIME_MODES, reset_auto_dense_budget
 from tools.eval_ternary_lora import apply_adapter, load_token_batches, logits_for
 from tools.repair_ternary_lora import load_model
 from tools.sensitivity_compression_scan import topk_agreement

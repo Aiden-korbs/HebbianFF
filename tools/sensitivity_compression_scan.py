@@ -21,10 +21,10 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 from chat_hf import cfg_from_ckpt, dtype_from_name, no_init_weights
-from ffbp_ema_cpu_ssm.bitnet import BitLinear
-from ffbp_ema_cpu_ssm.config import CFG
-from ffbp_ema_cpu_ssm.model import FF_LLM
-from ffbp_ema_cpu_ssm.packed_1bit import Packed1BitLinear
+from HebbianFF.bitnet import BitLinear
+from HebbianFF.config import CFG
+from HebbianFF.model import FF_LLM
+from HebbianFF.packed_1bit import Packed1BitLinear
 
 
 def mib(n: float) -> float:

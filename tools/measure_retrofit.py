@@ -1338,7 +1338,7 @@ def main() -> int:
         "int8_kv_hook": {
             "implemented": True,
             "off_switch": "KV_CACHE_INT8=0 or omit --cache-policies int8",
-            "hook_point": "ffbp_ema_cpu_ssm.blocks.RevGQACausalAttention.forward_kv stores int8 K/V plus fp16 per-token scales and dequantizes before SDPA.",
+            "hook_point": "HebbianFF.blocks.RevGQACausalAttention.forward_kv stores int8 K/V plus fp16 per-token scales and dequantizes before SDPA.",
         },
         "sample_comparison": samples,
         "parity": {

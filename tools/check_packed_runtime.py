@@ -13,7 +13,7 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
-from ffbp_ema_cpu_ssm.packed import is_packed_entry
+from HebbianFF.packed import is_packed_entry
 from tools.ternary_linear import TernaryLinear
 
 

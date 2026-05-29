@@ -2,7 +2,7 @@
 """
 Small FF-only ternary+EMA trainer for the existing FFBP-clean repo.
 
-Drop this script into the repo root. It uses ffbp_ema_cpu_ssm.FF_LLM with:
+Drop this script into the repo root. It uses HebbianFF.FF_LLM with:
   USE_BITNET=1, BP_LAYERS=0, USE_DRAFT_HEAD=0, FF_EMA_BP=1
 and trains on uint16 train.bin / val.bin files.
 """
@@ -24,9 +24,9 @@ import torch
 from torch import nn
 from tqdm import trange
 
-from ffbp_ema_cpu_ssm.config import CFG
-from ffbp_ema_cpu_ssm.model import FF_LLM
-from ffbp_ema_cpu_ssm.bitnet import (
+from HebbianFF.config import CFG
+from HebbianFF.model import FF_LLM
+from HebbianFF.bitnet import (
     bitnet_train_cache_peak_mib,
     bitnet_train_cache_stats,
     clear_bitnet_weight_caches,

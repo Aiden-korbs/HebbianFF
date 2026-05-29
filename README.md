@@ -6,17 +6,17 @@ This is research code. It is meant for experimentation and inspection, not as a 
 
 ## Key Ideas
 
-- **FF/BP model layout:** `ffbp_ema_cpu_ssm.model.FF_LLM` builds a stack of FF blocks plus optional BP/correction blocks. The current block implementation is a full-width residual decoder block; `RevBlock` remains as a compatibility alias.
-- **Ternary / BitNet training path:** `ffbp_ema_cpu_ssm.bitnet.BitLinear` and `train_ff_only_ternary_ema.py` support FF-only ternary training with EMA-triggered auxiliary losses.
+- **FF/BP model layout:** `HebbianFF.model.FF_LLM` builds a stack of FF blocks plus optional BP/correction blocks. The current block implementation is a full-width residual decoder block; `RevBlock` remains as a compatibility alias.
+- **Ternary / BitNet training path:** `HebbianFF.bitnet.BitLinear` and `train_ff_only_ternary_ema.py` support FF-only ternary training with EMA-triggered auxiliary losses.
 - **Hugging Face retrofit path:** `tools/import_hf.py` imports selected HF decoder checkpoints into the local `FF_LLM` checkpoint format for parity and retrofit experiments.
 - **Inference and serving:** `chat_hf.py` provides local checkpoint chat/inference. `web_chat.py` and `web_chat/server.py` provide web serving paths.
-- **Packed ternary runtime:** `ffbp_ema_cpu_ssm.ternary_runtime`, `tools/transfer_to_1bit.py`, and the ternary repair/eval scripts explore compact packed weights and repaired ternary adapters.
+- **Packed ternary runtime:** `HebbianFF.ternary_runtime`, `tools/transfer_to_1bit.py`, and the ternary repair/eval scripts explore compact packed weights and repaired ternary adapters.
 - **Low-VRAM experiments:** bounded KV cache, sink tokens, CPU offload helpers, packed linears, and benchmarking scripts are included, but many paths are explicitly experimental.
 
 ## Folder Structure
 
 ```text
-ffbp_ema_cpu_ssm/      Core model, blocks, config, BitNet layers, packed runtimes, memory helpers
+HebbianFF/      Core model, blocks, config, BitNet layers, packed runtimes, memory helpers
 scripts/               Small wrappers for importing/checking models and launching the local server
 tools/                 Import, evaluation, compression, ternary repair, benchmark, and diagnostic tools
 docs/                  Research notes and runtime/evaluation documentation

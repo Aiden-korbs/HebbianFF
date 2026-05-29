@@ -217,7 +217,7 @@ def map_layer(hf_layer, dst_block, profile: dict, layer_idx: int, copy_dtype: to
 def cfg_from_hf(hf_cfg, ff_layers: int, bp_layers: int, block_size: int):
     import math
     import os
-    from ffbp_ema_cpu_ssm.config import CFG
+    from HebbianFF.config import CFG
 
     inter   = int(hf_cfg.intermediate_size)
     n_embd  = int(hf_cfg.hidden_size)
@@ -515,8 +515,8 @@ def main():
 
     # ── Build FF_LLM ──────────────────────────────────────────────────────────
     print("\nBuilding FF_LLM …")
-    from ffbp_ema_cpu_ssm.config import CFG
-    from ffbp_ema_cpu_ssm.model import FF_LLM
+    from HebbianFF.config import CFG
+    from HebbianFF.model import FF_LLM
 
     # no_init_weights is defined in chat_hf.py; replicate it here
     import torch.nn.init as _init

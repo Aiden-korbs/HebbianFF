@@ -14,7 +14,7 @@ if str(PROJECT_ROOT) not in sys.path:
 
 import torch
 
-from ffbp_ema_cpu_ssm.ternary_runtime import (
+from HebbianFF.ternary_runtime import (
     reset_auto_dense_budget,
     reset_ternary_profile,
     save_profile_json,
