@@ -52,6 +52,7 @@ ternary_repair_runs/
 data/
 data_*/
 .hf_cache/
+.hf_home/
 hf_home/
 hf_datasets_cache/
 *.jsonl

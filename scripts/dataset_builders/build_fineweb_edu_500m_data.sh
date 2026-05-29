@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-cd "$(dirname "$0")"
+cd "$(dirname "$0")/../.."
 
 # FineWeb-Edu sample-10BT is the intended pretraining corpus for the 500M run.
 # uint16 bins use about 2 bytes/token, so the default 10B-token train split
 # writes roughly 20GB plus a small validation bin.
-export HF_HOME="${HF_HOME:-/home/corbs/datasets/hf_home}"
-export HF_DATASETS_CACHE="${HF_DATASETS_CACHE:-/home/corbs/datasets/hf_datasets_cache}"
+export HF_HOME="${HF_HOME:-.hf_home}"
+export HF_DATASETS_CACHE="${HF_DATASETS_CACHE:-hf_datasets_cache}"
 
 OUT_DIR="${OUT_DIR:-data/fineweb_edu_10bt_bpe32k}"
 VOCAB_SIZE="${VOCAB_SIZE:-32768}"
