@@ -4,6 +4,20 @@ This plan orders the existing architecture ideas by practical implementation com
 
 The safest principle is: keep the imported transformer path as the authority, then add memory and throughput optimizations around it. Anything that removes attention, skips layers, or replaces logits needs stronger parity tests and usually adaptation.
 
+## Current Repo Layout
+
+The codebase has been organized around the `HebbianFF` package and grouped entry-point scripts:
+
+- `HebbianFF/`: core model, blocks, config, BitNet layers, memory helpers, packed runtimes, and KV cache paths.
+- `scripts/inference/`: local chat and legacy Flask web-chat entry points.
+- `scripts/training/`: training scripts, launchers, resume helpers, and smoke tests.
+- `scripts/dataset_builders/`: dataset preparation scripts.
+- `scripts/benchmarks/`: CPU/GPU benchmark launchers.
+- `tools/`: import, evaluation, compression, ternary repair, measurement, and diagnostic tools.
+- `docs/`: research notes and runtime documentation.
+
+Run CLI examples from the repository root so local imports resolve consistently.
+
 ## Progress Checklist
 
 - [x] 1. Bounded KV Cache: implemented and smoke-tested.
@@ -356,6 +370,14 @@ python tools/measure_retrofit.py \
   --cache-policies full,bounded,sink,int8 \
   --bounded-cache-lens 128,256,512,1024 \
   --kv-cache-sink-tokens 64
+```
+
+For manual chat checks from an imported checkpoint:
+
+```bash
+USE_KV_CACHE=1 python scripts/inference/chat_hf.py \
+  --checkpoint models/Qwen2.5-Coder-0.5B-Instruct.pt \
+  --tokenizer Qwen/Qwen2.5-Coder-0.5B-Instruct
 ```
 
 Choose the smallest cache policy that keeps parity, recall, and throughput within acceptable limits.
