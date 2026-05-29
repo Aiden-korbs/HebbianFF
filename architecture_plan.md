@@ -18,6 +18,88 @@ The codebase has been organized around the `HebbianFF` package and grouped entry
 
 Run CLI examples from the repository root so local imports resolve consistently.
 
+## Training Plan
+
+The training track is separate from the inference retrofit track. Inference work should preserve imported checkpoint behavior by default; training work is where the FF/BP, Hebbian/EMA, draft-head, memory, and BitNet-style ideas can be changed and evaluated directly.
+
+Primary training entry points:
+
+- `scripts/training/train_ff_only_ternary_ema.py`: main FF-only ternary/BitNet EMA trainer.
+- `scripts/training/run_3070_tinystories.sh`: small TinyStories launcher for quick architecture checks.
+- `scripts/training/run_500m_fineweb_edu.sh`: larger FineWeb-Edu training configuration.
+- `scripts/training/run_500m_cpu_efficient.sh`: CPU-oriented wrapper around the FineWeb-Edu config.
+- `scripts/training/train_ff_draft_repair.py`: draft/correction repair training path.
+- `scripts/training/train_ff_then_draft.py`: two-stage FF plus draft-head training path.
+- `scripts/training/resume_eval_tiny.sh` and `scripts/training/train_tiny_roundtrip_test*.sh`: resume and smoke-test helpers.
+
+Dataset builders:
+
+- `scripts/dataset_builders/build_safe_pretrain_data.py`: small safe pretraining bins, currently suited to TinyStories-style checks.
+- `scripts/dataset_builders/build_large_pretrain_data.py`: larger streaming pretraining bin builder.
+- `scripts/dataset_builders/build_fineweb_edu_500m_data.sh`: FineWeb-Edu wrapper around the large builder.
+
+Recommended training order:
+
+1. Keep a tiny smoke loop passing before changing architecture internals.
+2. Train a small FF-only ternary EMA baseline on TinyStories.
+3. Scale the same code path to FineWeb-Edu only after loss curves, resume, eval, and checkpoint saves are stable.
+4. Add draft-head or BP correction training with the base path frozen or carefully staged.
+5. Only then train memory sidecars, CPU hash context, or engram retrieval modules.
+6. Compare trained checkpoints with the same inference harness used for imported models.
+
+Current stable training defaults:
+
+```bash
+USE_BITNET=1
+BP_LAYERS=0
+USE_DRAFT_HEAD=0
+MEMORY_TOKENS=0
+USE_ENGRAM=0
+CPU_HASH_CTX=0
+FF_EMA_BP=1
+```
+
+Tiny smoke workflow:
+
+```bash
+python scripts/dataset_builders/build_safe_pretrain_data.py \
+  --dataset roneneldan/TinyStories \
+  --out-dir data/ternary_tinystories \
+  --vocab-size 16000 \
+  --tokenizer-records 100000 \
+  --train-records 300000 \
+  --val-records 10000
+
+./scripts/training/run_3070_tinystories.sh --preset tiny
+```
+
+FineWeb-Edu workflow:
+
+```bash
+TARGET_TRAIN_TOKENS=1000000000 \
+TARGET_VAL_TOKENS=10000000 \
+./scripts/dataset_builders/build_fineweb_edu_500m_data.sh
+
+./scripts/training/run_500m_fineweb_edu.sh
+```
+
+Training acceptance criteria:
+
+- Training loss and validation loss decrease on the tiny workflow before scaling.
+- Resume-from-checkpoint reproduces sensible loss continuity.
+- `metrics.jsonl` contains enough information to compare runs by loss, tokens/sec, VRAM, and EMA diagnostics.
+- Generated samples from checkpoints are checked before declaring an architecture change useful.
+- For draft/BP/memory features, compare against the FF-only baseline at the same data, steps, and parameter budget.
+
+Near-term training priorities:
+
+1. Keep the FF-only ternary EMA path as the reference training baseline.
+2. Improve run comparability: fixed seeds, standard tiny config, standard FineWeb-Edu config, and consistent metrics.
+3. Add focused eval hooks to training outputs instead of judging by loss alone.
+4. Train draft head separately and measure whether it is accurate enough for speculative decoding.
+5. Train BP correction blocks only after the base FF path is stable.
+6. Train memory/CPU-context sidecars with KL distillation or frozen-base adaptation, not random serving-time enablement.
+
 ## Progress Checklist
 
 - [x] 1. Bounded KV Cache: implemented and smoke-tested.
