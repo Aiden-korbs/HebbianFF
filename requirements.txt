@@ -1,0 +1,11 @@
+# Install torch separately for your CUDA version if needed.
+# Example: pip install torch --index-url https://download.pytorch.org/whl/cu124
+transformers
+sentencepiece
+numpy
+datasets
+tokenizers
+tqdm
+fastapi
+uvicorn[standard]
+pydantic

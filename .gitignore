@@ -1,0 +1,63 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+.ipynb_checkpoints/
+
+# Local environments
+.venv/
+venv/
+env/
+ffllm/
+.env
+.env.*
+
+# Editors / OS
+.DS_Store
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Logs and run outputs
+*.log
+logs/
+runs/
+outputs/
+checkpoints/
+wandb/
+*.csv
+
+# ML artifacts and generated model state
+models/
+weights/
+ternary_repair_runs/
+*.pt
+*.pth
+*.safetensors
+*.gguf
+*.bin
+*.npy
+*.npz
+*.pkl
+*.pickle
+*.onnx
+
+# Datasets and local caches
+data/
+data_*/
+.hf_cache/
+hf_home/
+hf_datasets_cache/
+*.jsonl
+
+# Backups and scratch files
+*.bak
+*.bak_*
+old/
+*.tmp

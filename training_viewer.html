@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Training Run Viewer</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #101214;
+      color: #e7e9ec;
+    }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: #101214;
+    }
+    header {
+      padding: 18px 24px 12px;
+      border-bottom: 1px solid #2c3137;
+      background: #15181c;
+    }
+    h1 {
+      margin: 0 0 8px;
+      font-size: 20px;
+      font-weight: 650;
+    }
+    .subtle {
+      color: #a7b0bb;
+      font-size: 13px;
+    }
+    main {
+      display: grid;
+      gap: 16px;
+      padding: 16px 24px 24px;
+    }
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 10px;
+    }
+    .metric {
+      border: 1px solid #2c3137;
+      border-radius: 8px;
+      padding: 12px;
+      background: #171b20;
+    }
+    .label {
+      color: #a7b0bb;
+      font-size: 12px;
+      margin-bottom: 6px;
+    }
+    .value {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 18px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .panel {
+      border: 1px solid #2c3137;
+      border-radius: 8px;
+      overflow: hidden;
+      background: #0d0f12;
+    }
+    .panel h2 {
+      margin: 0;
+      padding: 10px 12px;
+      border-bottom: 1px solid #2c3137;
+      background: #171b20;
+      font-size: 14px;
+      font-weight: 600;
+    }
+    pre {
+      margin: 0;
+      padding: 12px;
+      height: 52vh;
+      overflow: auto;
+      white-space: pre-wrap;
+      word-break: break-word;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 12px;
+      line-height: 1.45;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>ff_ternary_ema_fineweb_500m_nort</h1>
+    <div class="subtle" id="status">Loading...</div>
+  </header>
+  <main>
+    <section class="metrics" id="metrics"></section>
+    <section class="panel">
+      <h2>Live Log Tail</h2>
+      <pre id="log"></pre>
+    </section>
+  </main>
+  <script>
+    const metricsPath = "runs/ff_ternary_ema_fineweb_500m_nort/metrics.jsonl";
+    const logPath = "logs/fineweb_500m_train_20260525_115624_restart.log";
+    const metricKeys = [
+      ["step", "Step"],
+      ["train_loss", "Train Loss"],
+      ["val_loss", "Val Loss"],
+      ["best_val_loss", "Best Val"],
+      ["val_ppl", "Val PPL"],
+      ["tok_s", "Tok/s"],
+      ["gpu_alloc_gib", "GPU Alloc GiB"],
+      ["gpu_peak_gib", "GPU Peak GiB"],
+      ["elapsed_min", "Elapsed Min"],
+      ["diag_ff_ema_trips", "EMA Trips"],
+      ["diag_ff_ema_max_z", "EMA Max Z"]
+    ];
+
+    function fmt(value) {
+      if (value === undefined || value === null || Number.isNaN(value)) return "--";
+      if (typeof value !== "number") return String(value);
+      if (Math.abs(value) >= 1000) return value.toLocaleString(undefined, { maximumFractionDigits: 0 });
+      if (Math.abs(value) >= 10) return value.toFixed(2);
+      return value.toFixed(4);
+    }
+
+    function parseLastMetric(text) {
+      const lines = text.trim().split(/\n+/).filter(Boolean);
+      for (let i = lines.length - 1; i >= 0; i--) {
+        try {
+          return JSON.parse(lines[i].replace(/\bNaN\b/g, "null"));
+        } catch (_) {}
+      }
+      return {};
+    }
+
+    function cleanLogTail(text) {
+      const tail = text.slice(-40000).replace(/\r/g, "\n");
+      return tail.split("\n").filter(Boolean).slice(-90).join("\n");
+    }
+
+    async function refresh() {
+      const [metricsRes, logRes] = await Promise.all([
+        fetch(metricsPath + "?t=" + Date.now()),
+        fetch(logPath + "?t=" + Date.now())
+      ]);
+      const metric = parseLastMetric(await metricsRes.text());
+      document.getElementById("metrics").innerHTML = metricKeys.map(([key, label]) => `
+        <div class="metric">
+          <div class="label">${label}</div>
+          <div class="value">${fmt(metric[key])}</div>
+        </div>
+      `).join("");
+      const logEl = document.getElementById("log");
+      logEl.textContent = cleanLogTail(await logRes.text());
+      logEl.scrollTop = logEl.scrollHeight;
+      document.getElementById("status").textContent = "Refreshing every 5 seconds from " + metricsPath;
+    }
+
+    refresh().catch((error) => {
+      document.getElementById("status").textContent = "Viewer error: " + error.message;
+    });
+    setInterval(() => refresh().catch(console.error), 5000);
+  </script>
+</body>
+</html>
