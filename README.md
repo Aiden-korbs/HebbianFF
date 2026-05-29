@@ -1,6 +1,6 @@
-# ternary-revforge
+# HebbianFF
 
-`ternary-revforge` is an experimental PyTorch research repo for FF/BP-style causal language models, ternary/BitNet-style training, Hugging Face checkpoint import, and low-VRAM inference experiments. The active code centers on `FF_LLM`, a decoder-only model with configurable feed-forward and backprop/correction blocks, grouped-query attention, RoPE, optional draft/memory sidecars, checkpoint import tools, and packed ternary runtime utilities.
+`HebbianFF` is an experimental PyTorch research repo for FF/BP-style causal language models, ternary/BitNet-style training, Hugging Face checkpoint import, and low-VRAM inference experiments. The active code centers on `FF_LLM`, a decoder-only model with configurable feed-forward and backprop/correction blocks, grouped-query attention, RoPE, optional draft/memory sidecars, checkpoint import tools, and packed ternary runtime utilities.
 
 This is research code. It is meant for experimentation and inspection, not as a stable library or a production serving stack.
 
@@ -46,8 +46,8 @@ Optional acceleration packages such as `bitsandbytes`, Triton, Intel IPEX, or Li
 ## Setup
 
 ```bash
-git clone <your-fork-url> ternary-revforge
-cd ternary-revforge
+git clone <your-fork-url> HebbianFF
+cd HebbianFF
 python -m venv .venv
 source .venv/bin/activate
 pip install -U pip
